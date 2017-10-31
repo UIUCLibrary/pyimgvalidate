@@ -50,6 +50,9 @@ pipeline {
                                 checkout scm
                                 bat "${tool 'Python3.6.3_Win64'} -m tox -e docs"
                                 dir('.tox/dist/') {
+                                    dir("html") {
+                                        stash includes: '**', name: "HTML Documentation", useDefaultExcludes: false
+                                    }
                                     zip archive: true, dir: 'html', glob: '', zipFile: 'sphinx_html_docs.zip'
                                 }
                             }
@@ -209,9 +212,6 @@ pipeline {
                         bat "${tool 'Python3.6.3_Win64'} -m devpi push ${name}==${version} production/${params.RELEASE}"
                     }
 
-                }
-                node("Linux"){
-                    updateOnlineDocs url_subdomain: params.URL_SUBFOLDER, stash_name: "HTML Documentation"
                 }
             }
         }
