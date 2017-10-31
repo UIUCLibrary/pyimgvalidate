@@ -63,7 +63,10 @@ pipeline {
             }
             post {
               success {
-                  zip archive: true, dir: 'html', glob: '', zipFile: 'sphinx_html_docs.zip'
+                dir('.tox/dist/') {
+                    zip archive: true, dir: 'html', glob: '', zipFile: 'sphinx_html_docs.zip'
+                }
+                  
               }
             }
         }
