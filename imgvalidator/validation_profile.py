@@ -47,7 +47,7 @@ def identify_icc_profile(profile) -> IccProfileType:
 
 
 class create_builder:
-    def __init__(self, profile_builder: AbsProfileBuilder):
+    def __init__(self, profile_builder: AbsProfileBuilder) -> None:
         self._profile_builder = profile_builder
 
     def build_profile(self):
