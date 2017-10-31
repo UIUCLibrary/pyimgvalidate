@@ -46,11 +46,17 @@ pipeline {
             steps {
                 parallel(
                         "Documentation": {
-                          bat "${tool 'Python3.6.3_Win64'} -m tox -e docs" 
+                            node(label: "Windows") {
+                                checkout scm
+                                bat "${tool 'Python3.6.3_Win64'} -m tox -e docs" 
+                            }
+                          
                         },
                         "MyPy": {
-                            bat "${tool 'Python3.6.3_Win64'} -m tox -e mypy"
-                            junit 'mypy.xml'
+                            node(label: "Windows") {
+                                bat "${tool 'Python3.6.3_Win64'} -m tox -e mypy"
+                                junit 'mypy.xml'
+                            }
                           }
                 )
             }
