@@ -54,6 +54,7 @@ pipeline {
                         },
                         "MyPy": {
                             node(label: "Windows") {
+                                checkout scm
                                 bat "${tool 'Python3.6.3_Win64'} -m tox -e mypy"
                                 junit 'mypy.xml'
                             }
