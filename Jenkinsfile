@@ -163,11 +163,17 @@ pipeline {
                                         bat "${tool 'Python3.6.3_Win64'} -m devpi login ${DEVPI_USERNAME} --password ${DEVPI_PASSWORD}"
                                         bat "${tool 'Python3.6.3_Win64'} -m devpi use /${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging"
                                         echo "Testing Source package in devpi"
-                                        bat "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s tar.gz"
-                                        script{
-                                            def errors = bat(returnStdout: true, script:"${tool 'Python3.6.3_Win64'} -m devpi list ${name}==${version} -f").trim()
-                                            echo "errors = ${errors}"
-                                        }
+                                        bat "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s tar.gz --tox-args=\"--result-json \"%CD%\\reports.json\"\""
+                                        readFile 'reports.json'
+
+                                        // script{
+                                        //     def errors = bat(returnStdout: true, script:"${tool 'Python3.6.3_Win64'} -m devpi list ${name}==${version} -f").trim()
+                                        //     if  errors != "" {
+                                        //         echo "errors = ${errors}"
+                                        //         error("${errors}")
+                                        //     }
+                                            
+                                        // }
                                     }
                                 }
 
@@ -182,7 +188,8 @@ pipeline {
                                         bat "${tool 'Python3.6.3_Win64'} -m devpi login ${DEVPI_USERNAME} --password ${DEVPI_PASSWORD}"
                                         bat "${tool 'Python3.6.3_Win64'} -m devpi use /${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging"
                                         echo "Testing Whl package in devpi"
-                                        bat "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl"
+                                        bat "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl --tox-args=\"--result-json \"%CD%\\reports.json\"\""
+                                        readFile 'reports.json'
 
                                     }
                                 }
