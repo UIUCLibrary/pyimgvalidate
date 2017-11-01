@@ -71,7 +71,6 @@ build_exe_options = {
     "packages": [
         "os",
         'pytest',
-        # "lxml",
         "packaging",
         "six",
         "appdirs",
@@ -94,8 +93,7 @@ cx_Freeze.setup(
     options={
         "build_exe": build_exe_options,
         "bdist_msi": {
-			# TODO: Fill in upgrade_code. example: {D8846842-2CF4-4F9A-8A2A-FFAFD8A5E10B}
-            # "upgrade_code": "",
+            "upgrade_code": "39B7662E-8A18-447C-8FA3-E4FE377BAB2F",
             "data": {
                 "Shortcut": shortcut_table,
                 "Directory": directory_table
