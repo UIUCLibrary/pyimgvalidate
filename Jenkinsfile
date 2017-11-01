@@ -55,7 +55,7 @@ pipeline {
                         "MyPy": {
                             node(label: "Windows") {
                                 checkout scm
-                                bat "${tool 'Python3.6.3_Win64'} -m tox -e mypy"
+                                bat "make test-mypy --html-report reports/mypy_report --junit-xml reports/mypy.xml"
                                 junit 'mypy.xml'
                             }
                           }
@@ -86,13 +86,14 @@ pipeline {
                             node(label: "Windows") {
                                 deleteDir()
                                 checkout scm
-                                bat """${tool 'Python3.6.3_Win64'} -m venv venv
-                                       call venv/Scripts/activate.bat
-                                       pip install -r requirements.txt
-                                       python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
-                                       call venv/Scripts/deactivate.bat
-                                    """
-                                bat "build\\msi\\imgvalidator.exe --pytest"
+                                // bat """${tool 'Python3.6.3_Win64'} -m venv venv
+                                //        call venv/Scripts/activate.bat
+                                //        pip install -r requirements.txt
+                                //        python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
+                                //        call venv/Scripts/deactivate.bat
+                                //     """
+                                bat "${tool 'Python3.6.3_Win64'} -m venv venv"
+                                bat "make test-mypy --html-report reports/mypy_report --junit-xml reports/mypy.xml"
                                 dir("dist") {
                                     stash includes: "*.msi", name: "msi"
                                 }
