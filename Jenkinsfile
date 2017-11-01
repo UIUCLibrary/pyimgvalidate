@@ -165,6 +165,7 @@ pipeline {
                                         echo "Testing Source package in devpi"
                                         script {
                                              def devpi_test = bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s tar.gz")
+                                             echo "devpi_test = ${devpi_test}"
                                         }
                                         // bat 
                                         readFile 'reports.json'
@@ -193,6 +194,7 @@ pipeline {
                                         echo "Testing Whl package in devpi"
                                         script {
                                             def devpi_test =  bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl")
+                                            echo "devpi_test = ${devpi_test}"
                                             readFile 'reports.json'
                                         }
 
