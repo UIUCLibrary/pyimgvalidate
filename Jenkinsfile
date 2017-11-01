@@ -165,7 +165,7 @@ pipeline {
                                         bat "${tool 'Python3.6.3_Win64'} -m devpi use /${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging"
                                         echo "Testing Source package in devpi"
                                         bat """${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s tar.gz
-                                        if not %ERRORLEVEL% == 0 exit /b %ERRORLEVEL%
+                                            if not %ERRORLEVEL% == 0 exit /b %ERRORLEVEL%
                                         """
                                     }
                                 }
