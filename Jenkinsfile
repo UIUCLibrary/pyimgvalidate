@@ -86,44 +86,44 @@ pipeline {
                                     pip install -r requirements-dev.txt
                                     python setup.py sdist bdist_wheel
                                     """
-                        }
-                        // "Windows CX_Freeze MSI": {
-                        //     node(label: "Windows") {
-                        //         deleteDir()
-                        //         checkout scm
-                        //         // bat """${tool 'Python3.6.3_Win64'} -m venv venv
-                        //         //        call venv/Scripts/activate.bat
-                        //         //        pip install -r requirements.txt
-                        //         //        python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
-                        //         //        call venv/Scripts/deactivate.bat
-                        //         //     """
-                        //         bat "${tool 'Python3.6.3_Win64'} -m venv venv"
-                        //         bat "make freeze"
-                        //         dir("dist") {
-                        //             stash includes: "*.msi", name: "msi"
-                        //         }
+                        },
+                        "Windows CX_Freeze MSI": {
+                            node(label: "Windows") {
+                                deleteDir()
+                                checkout scm
+                                // bat """${tool 'Python3.6.3_Win64'} -m venv venv
+                                //        call venv/Scripts/activate.bat
+                                //        pip install -r requirements.txt
+                                //        python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
+                                //        call venv/Scripts/deactivate.bat
+                                //     """
+                                bat "${tool 'Python3.6.3_Win64'} -m venv venv"
+                                bat "make freeze"
+                                dir("dist") {
+                                    stash includes: "*.msi", name: "msi"
+                                }
 
-                        //     }
-                        //     node(label: "Windows") {
-                        //         deleteDir()
-                        //         git url: 'https://github.com/UIUCLibrary/ValidateMSI.git'
-                        //         unstash "msi"
-                        //         bat "call validate.bat -i"
+                            }
+                            node(label: "Windows") {
+                                deleteDir()
+                                git url: 'https://github.com/UIUCLibrary/ValidateMSI.git'
+                                unstash "msi"
+                                bat "call validate.bat -i"
                                 
-                        //     }
-                        // },
+                            }
+                        },
                 )
             }
-            // post {
-            //   success {
-            //       dir("dist"){
-            //           unstash "msi"
-            //           archiveArtifacts artifacts: "*.whl", fingerprint: true
-            //           archiveArtifacts artifacts: "*.tar.gz", fingerprint: true
-            //           archiveArtifacts artifacts: "*.msi", fingerprint: true
-            //     }
-            //   }
-            // }
+            post {
+              success {
+                  dir("dist"){
+                      unstash "msi"
+                      archiveArtifacts artifacts: "*.whl", fingerprint: true
+                      archiveArtifacts artifacts: "*.tar.gz", fingerprint: true
+                      archiveArtifacts artifacts: "*.msi", fingerprint: true
+                }
+              }
+            }
             
         }
 
@@ -166,20 +166,9 @@ pipeline {
                                         script {
                                              def devpi_test = bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s tar.gz").trim()
                                              if(devpi_test =~ 'tox command failed') {
-                                                error("${devpi_test}")
+                                                error("Tox command failed")
                                             }
                                         }
-                                        // bat 
-                                        
-
-                                        // script{
-                                        //     def errors = bat(returnStdout: true, script:"${tool 'Python3.6.3_Win64'} -m devpi list ${name}==${version} -f").trim()
-                                        //     if  errors != "" {
-                                        //         echo "errors = ${errors}"
-                                        //         error("${errors}")
-                                        //     }
-                                            
-                                        // }
                                     }
                                 }
 
@@ -197,7 +186,7 @@ pipeline {
                                         script {
                                             def devpi_test =  bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl").trim()
                                             if(devpi_test =~ 'tox command failed') {
-                                                error("${devpi_test}")
+                                                error("Tox command failed")
                                             }
                                             
                                         }
@@ -223,6 +212,16 @@ pipeline {
                         }
 
                     }
+                }
+                failure{
+                    script {
+                        def name = bat(returnStdout: true, script: "@${tool 'Python3.6.3_Win64'} setup.py --name").trim()
+                        def version = bat(returnStdout: true, script: "@${tool 'Python3.6.3_Win64'} setup.py --version").trim()
+                        withCredentials([usernamePassword(credentialsId: 'DS_devpi', usernameVariable: 'DEVPI_USERNAME', passwordVariable: 'DEVPI_PASSWORD')]) {
+                            bat "${tool 'Python3.6.3_Win64'} -m devpi remove -y ${name}==${version}"
+                    }
+                    
+
                 }
             }
         }
