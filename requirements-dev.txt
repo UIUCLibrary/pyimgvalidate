@@ -3,7 +3,5 @@ wheel
 sphinx
 pytest
 pytest-runner
-six
-appdirs
-packaging
 tox
+py3exiv2bind
