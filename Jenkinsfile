@@ -14,7 +14,6 @@ pipeline {
         string(name: "PROJECT_NAME", defaultValue: "imgvalidator", description: "Name given to the project")
         booleanParam(name: "UNIT_TESTS", defaultValue: true, description: "Run automated unit tests")
         booleanParam(name: "ADDITIONAL_TESTS", defaultValue: true, description: "Run additional tests")
-        booleanParam(name: "PACKAGE", defaultValue: true, description: "Create a package")
         booleanParam(name: "DEPLOY_DEVPI", defaultValue: true, description: "Deploy to devpi on http://devpy.library.illinois.edu/DS_Jenkins/${env.BRANCH_NAME}")
         choice(choices: 'None\nRelease_to_devpi_only\nRelease_to_devpi_and_sccm\n', description: "Release the build to production. Only available in the Master branch", name: 'RELEASE')
         booleanParam(name: "UPDATE_DOCS", defaultValue: false, description: "Update online documentation")
@@ -76,7 +75,7 @@ pipeline {
 
         stage("Packaging") {
             when {
-                expression { params.PACKAGE == true }
+                expression { params.DEPLOY_DEVPI == true || params.RELEASE != "None"}
             }
 
             steps {
@@ -179,7 +178,10 @@ pipeline {
                                         bat "${tool 'Python3.6.3_Win64'} -m devpi login ${DEVPI_USERNAME} --password ${DEVPI_PASSWORD}"
                                         bat "${tool 'Python3.6.3_Win64'} -m devpi use /${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging"
                                         echo "Testing Whl package in devpi"
-                                        bat "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl && if not %ERRORLEVEL% == 0 exit /b %ERRORLEVEL%"
+                                        bat """${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl 
+                                        set error=%ERRORLEVEL%
+                                        echo errorlevels = %error%
+                                        if not %ERRORLEVEL% == 0 exit /b %ERRORLEVEL%"""
                                     }
                                 }
 
