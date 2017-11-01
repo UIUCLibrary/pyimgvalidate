@@ -126,7 +126,8 @@ goto :eof
     setlocal
     call venv\Scripts\activate.bat
     python -m pip install -r requirements-freeze.txt
-    python cx_setup.py bdist_msi
+    python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
+    call build\\msi\\imgvalidator.exe --pytest
     endlocal
 goto :eof
 
