@@ -37,6 +37,11 @@ pipeline {
             steps {
                 bat "${tool 'Python3.6.3_Win64'} -m tox"
             }
+            post{
+                always {
+                    junit 'reports/junit-*.xml'
+                }
+            }
         }
         stage("Additional tests") {
             when {
