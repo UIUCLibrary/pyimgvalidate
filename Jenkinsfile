@@ -48,7 +48,13 @@ pipeline {
                         "Documentation": {
                             node(label: "Windows") {
                                 checkout scm
-                                bat "${tool 'Python3.6.3_Win64'} -m tox -e docs" 
+                                bat "${tool 'Python3.6.3_Win64'} -m tox -e docs"
+                                dir('.tox/dist') {
+                                    zip archive: true, dir: 'html', glob: '', zipFile: 'sphinx_html_docs.zip'
+                                    dir("html"){
+                                        stash includes: '**', name: "HTML Documentation"
+                                    }
+                                }
                             }
                           
                         },
@@ -63,7 +69,8 @@ pipeline {
             }
             post {
               success {
-                  zip archive: true, dir: 'html', glob: '', zipFile: 'sphinx_html_docs.zip'
+                  unstash "HTML Documentation"
+                  
               }
             }
         }
