@@ -86,32 +86,32 @@ pipeline {
                                     pip install -r requirements-dev.txt
                                     python setup.py sdist bdist_wheel
                                     """
-                        },
-                        "Windows CX_Freeze MSI": {
-                            node(label: "Windows") {
-                                deleteDir()
-                                checkout scm
-                                // bat """${tool 'Python3.6.3_Win64'} -m venv venv
-                                //        call venv/Scripts/activate.bat
-                                //        pip install -r requirements.txt
-                                //        python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
-                                //        call venv/Scripts/deactivate.bat
-                                //     """
-                                bat "${tool 'Python3.6.3_Win64'} -m venv venv"
-                                bat "make freeze"
-                                dir("dist") {
-                                    stash includes: "*.msi", name: "msi"
-                                }
+                        }
+                        // "Windows CX_Freeze MSI": {
+                        //     node(label: "Windows") {
+                        //         deleteDir()
+                        //         checkout scm
+                        //         // bat """${tool 'Python3.6.3_Win64'} -m venv venv
+                        //         //        call venv/Scripts/activate.bat
+                        //         //        pip install -r requirements.txt
+                        //         //        python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
+                        //         //        call venv/Scripts/deactivate.bat
+                        //         //     """
+                        //         bat "${tool 'Python3.6.3_Win64'} -m venv venv"
+                        //         bat "make freeze"
+                        //         dir("dist") {
+                        //             stash includes: "*.msi", name: "msi"
+                        //         }
 
-                            }
-                            node(label: "Windows") {
-                                deleteDir()
-                                git url: 'https://github.com/UIUCLibrary/ValidateMSI.git'
-                                unstash "msi"
-                                bat "call validate.bat -i"
+                        //     }
+                        //     node(label: "Windows") {
+                        //         deleteDir()
+                        //         git url: 'https://github.com/UIUCLibrary/ValidateMSI.git'
+                        //         unstash "msi"
+                        //         bat "call validate.bat -i"
                                 
-                            }
-                        },
+                        //     }
+                        // },
                 )
             }
             post {
@@ -164,7 +164,7 @@ pipeline {
                                         bat "${tool 'Python3.6.3_Win64'} -m devpi use /${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging"
                                         echo "Testing Source package in devpi"
                                         script {
-                                             def devpi_test = bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s tar.gz")
+                                             def devpi_test = bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s tar.gz").trim()
                                              echo "devpi_test = ${devpi_test}"
                                         }
                                         // bat 
@@ -193,8 +193,8 @@ pipeline {
                                         bat "${tool 'Python3.6.3_Win64'} -m devpi use /${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging"
                                         echo "Testing Whl package in devpi"
                                         script {
-                                            def devpi_test =  bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl")
-                                            echo "devpi_test = ${devpi_test}"
+                                            def devpi_test =  bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl").trim()
+                                            echo "devpi_test = ${devpi_test.split("\n")}"
                                             readFile 'reports.json'
                                         }
 
