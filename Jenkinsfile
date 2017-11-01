@@ -165,7 +165,7 @@ pipeline {
                                         echo "Testing Source package in devpi"
                                         script {
                                              def devpi_test = bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s tar.gz").trim()
-                                             if(devpi_test ~= 'tox command failed') {
+                                             if(devpi_test =~ 'tox command failed') {
                                                 error("${devpi_test}")
                                             }
                                         }
@@ -196,7 +196,7 @@ pipeline {
                                         echo "Testing Whl package in devpi"
                                         script {
                                             def devpi_test =  bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl").trim()
-                                            if(devpi_test ~= 'tox command failed') {
+                                            if(devpi_test =~ 'tox command failed') {
                                                 error("${devpi_test}")
                                             }
                                             
