@@ -67,12 +67,6 @@ pipeline {
                           }
                 )
             }
-            post {
-              success {
-                  unstash "HTML Documentation"
-                  
-              }
-            }
         }
 
         stage("Packaging") {
