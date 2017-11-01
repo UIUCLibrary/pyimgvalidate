@@ -165,10 +165,12 @@ pipeline {
                                         echo "Testing Source package in devpi"
                                         script {
                                              def devpi_test = bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s tar.gz").trim()
-                                             echo "devpi_test = ${devpi_test}"
+                                             if(devpi_test ~= 'tox command failed') {
+                                                error("${devpi_test}")
+                                            }
                                         }
                                         // bat 
-                                        readFile 'reports.json'
+                                        
 
                                         // script{
                                         //     def errors = bat(returnStdout: true, script:"${tool 'Python3.6.3_Win64'} -m devpi list ${name}==${version} -f").trim()
@@ -194,8 +196,10 @@ pipeline {
                                         echo "Testing Whl package in devpi"
                                         script {
                                             def devpi_test =  bat(returnStdout: true, script: "${tool 'Python3.6.3_Win64'} -m devpi test --index http://devpi.library.illinois.edu/${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging ${name} -s whl").trim()
-                                            echo "devpi_test = ${devpi_test.split("\n")}"
-                                            readFile 'reports.json'
+                                            if(devpi_test ~= 'tox command failed') {
+                                                error("${devpi_test}")
+                                            }
+                                            
                                         }
 
                                     }
