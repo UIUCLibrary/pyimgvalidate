@@ -91,12 +91,6 @@ pipeline {
                             node(label: "Windows") {
                                 deleteDir()
                                 checkout scm
-                                // bat """${tool 'Python3.6.3_Win64'} -m venv venv
-                                //        call venv/Scripts/activate.bat
-                                //        pip install -r requirements.txt
-                                //        python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
-                                //        call venv/Scripts/deactivate.bat
-                                //     """
                                 bat "${tool 'Python3.6.3_Win64'} -m venv venv"
                                 bat "make freeze"
                                 dir("dist") {
