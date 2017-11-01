@@ -94,7 +94,7 @@ pipeline {
                                 //        call venv/Scripts/deactivate.bat
                                 //     """
                                 bat "${tool 'Python3.6.3_Win64'} -m venv venv"
-                                bat "make test-mypy --html-report reports/mypy_report --junit-xml reports/mypy.xml"
+                                bat "make freeze"
                                 dir("dist") {
                                     stash includes: "*.msi", name: "msi"
                                 }
