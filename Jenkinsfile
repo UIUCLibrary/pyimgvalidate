@@ -91,12 +91,6 @@ pipeline {
                             node(label: "Windows") {
                                 deleteDir()
                                 checkout scm
-                                // bat """${tool 'Python3.6.3_Win64'} -m venv venv
-                                //        call venv/Scripts/activate.bat
-                                //        pip install -r requirements.txt
-                                //        python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
-                                //        call venv/Scripts/deactivate.bat
-                                //     """
                                 bat "${tool 'Python3.6.3_Win64'} -m venv venv"
                                 bat "make freeze"
                                 dir("dist") {
@@ -215,27 +209,6 @@ pipeline {
                 }
             }
         }
-        stage("Release to DevPi production") {
-            when {
-                expression { params.RELEASE != "None" && env.BRANCH_NAME == "master" }
-            }
-            steps {
-                script {
-                    def name = bat(returnStdout: true, script: "@${tool 'Python3.6.3_Win64'} setup.py --name").trim()
-                    def version = bat(returnStdout: true, script: "@${tool 'Python3.6.3_Win64'} setup.py --version").trim()
-                    withCredentials([usernamePassword(credentialsId: 'DS_devpi', usernameVariable: 'DEVPI_USERNAME', passwordVariable: 'DEVPI_PASSWORD')]) {
-                        bat "${tool 'Python3.6.3_Win64'} -m devpi login ${DEVPI_USERNAME} --password ${DEVPI_PASSWORD}"
-                        bat "${tool 'Python3.6.3_Win64'} -m devpi use /${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging"
-                        bat "${tool 'Python3.6.3_Win64'} -m devpi push ${name}==${version} production/${params.RELEASE}"
-                    }
-
-                }
-                node("Linux"){
-                    updateOnlineDocs url_subdomain: params.URL_SUBFOLDER, stash_name: "HTML Documentation"
-                }
-            }
-        }
-
         stage("Deploy to SCCM") {
             when {
                 expression { params.RELEASE == "Release_to_devpi_and_sccm"}
@@ -245,7 +218,7 @@ pipeline {
                 node("Linux"){
                     unstash "msi"
                     deployStash("msi", "${env.SCCM_STAGING_FOLDER}/${params.PROJECT_NAME}/")
-                    input("Deploy to production?")
+                    input("Push a SCCM release?")
                     deployStash("msi", "${env.SCCM_UPLOAD_FOLDER}")
                 }
 
@@ -258,6 +231,27 @@ pipeline {
                         writeFile file: "deployment_request.txt", text: deployment_request
                         archiveArtifacts artifacts: "deployment_request.txt"
                     }
+                }
+            }
+        }
+        stage("Release to DevPi production") {
+            when {
+                expression { params.RELEASE != "None" && env.BRANCH_NAME == "master" }
+            }
+            steps {
+                script {
+                    def name = bat(returnStdout: true, script: "@${tool 'Python3.6.3_Win64'} setup.py --name").trim()
+                    def version = bat(returnStdout: true, script: "@${tool 'Python3.6.3_Win64'} setup.py --version").trim()
+                    input("Are you sure you want to push ${name} version ${version} to production? This version cannot be overwritten.")
+                    withCredentials([usernamePassword(credentialsId: 'DS_devpi', usernameVariable: 'DEVPI_USERNAME', passwordVariable: 'DEVPI_PASSWORD')]) {
+                        bat "${tool 'Python3.6.3_Win64'} -m devpi login ${DEVPI_USERNAME} --password ${DEVPI_PASSWORD}"
+                        bat "${tool 'Python3.6.3_Win64'} -m devpi use /${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging"
+                        bat "${tool 'Python3.6.3_Win64'} -m devpi push ${name}==${version} production/release"
+                    }
+
+                }
+                node("Linux"){
+                    updateOnlineDocs url_subdomain: params.URL_SUBFOLDER, stash_name: "HTML Documentation"
                 }
             }
         }
