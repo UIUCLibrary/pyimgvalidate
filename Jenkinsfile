@@ -217,6 +217,7 @@ pipeline {
                 script {
                     def name = bat(returnStdout: true, script: "@${tool 'Python3.6.3_Win64'} setup.py --name").trim()
                     def version = bat(returnStdout: true, script: "@${tool 'Python3.6.3_Win64'} setup.py --version").trim()
+                    input("Are you sure you want to push ${name} version ${version} to production? This version cannot be overwritten.")
                     withCredentials([usernamePassword(credentialsId: 'DS_devpi', usernameVariable: 'DEVPI_USERNAME', passwordVariable: 'DEVPI_PASSWORD')]) {
                         bat "${tool 'Python3.6.3_Win64'} -m devpi login ${DEVPI_USERNAME} --password ${DEVPI_PASSWORD}"
                         bat "${tool 'Python3.6.3_Win64'} -m devpi use /${DEVPI_USERNAME}/${env.BRANCH_NAME}_staging"
@@ -239,7 +240,7 @@ pipeline {
                 node("Linux"){
                     unstash "msi"
                     deployStash("msi", "${env.SCCM_STAGING_FOLDER}/${params.PROJECT_NAME}/")
-                    input("Deploy to production?")
+                    input("Push a SCCM release?")
                     deployStash("msi", "${env.SCCM_UPLOAD_FOLDER}")
                 }
 
