@@ -14,7 +14,7 @@ def find_icc_errors(image_file: py3exiv2bind.Image, expected_icc_profile_type):
         yield "Unidentified ICC color profile"
     else:
         if icc_type != expected_icc_profile_type:
-            yield "Color Format incorrect: Expected '{}'. Received '{}'.".format(expected_icc_profile_type.value, icc_type.value)
+            yield "ICC Color profile incorrect: Expected '{}'. Received '{}'.".format(expected_icc_profile_type.value, icc_type.value)
 
 
 def validate_file(file_name, validation_profile: validation_profile.ValidationProfile):
