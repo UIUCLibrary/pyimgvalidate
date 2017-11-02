@@ -15,6 +15,7 @@ class ValidationProfile:
         self.embedded_metadata_profile = dict()
         self.icc_profile_type = None
         self.name = None
+        self.file_extension = None
 
 
 class AbsProfileBuilder(metaclass=abc.ABCMeta):
@@ -36,6 +37,10 @@ class AbsProfileBuilder(metaclass=abc.ABCMeta):
     def get_profile(self):
         return self._profile
 
+    @abc.abstractmethod
+    def set_file_extension(self):
+        pass
+
 
 def identify_icc_profile(profile) -> IccProfileType:
     if str(profile['device_model']) == "sRGB":
@@ -46,14 +51,15 @@ def identify_icc_profile(profile) -> IccProfileType:
         return IccProfileType.UNKNOWN
 
 
-class create_builder:
+class ProfileBuilder:
     def __init__(self, profile_builder: AbsProfileBuilder) -> None:
         self._profile_builder = profile_builder
 
-    def build_profile(self):
+    def build_profile(self)->ValidationProfile:
         self._profile_builder.new_profile()
         self._profile_builder.set_embedded_metadata_profile()
         self._profile_builder.set_icc_profile_type()
+        self._profile_builder.set_file_extension()
         return self._profile_builder.get_profile()
 
 

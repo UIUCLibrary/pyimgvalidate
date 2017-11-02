@@ -58,6 +58,9 @@ class DSHathiAccessTiff(validation_profile.AbsProfileBuilder):
     def set_icc_profile_type(self):
         self._profile.icc_profile_type = validation_profile.IccProfileType.SRGB
 
+    def set_file_extension(self):
+        self._profile.file_extension = ".tif"
+
 
 class DSPreservationTiff(validation_profile.AbsProfileBuilder):
 
@@ -115,3 +118,6 @@ class DSPreservationTiff(validation_profile.AbsProfileBuilder):
 
     def set_icc_profile_type(self):
         self._profile.icc_profile_type = validation_profile.IccProfileType.ADOBE_RGB
+
+    def set_file_extension(self):
+        self._profile.file_extension = ".tif"
