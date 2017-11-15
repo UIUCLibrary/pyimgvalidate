@@ -1,0 +1,2 @@
+py3exiv2bind
+setuptools>=30.3.0
