@@ -10,6 +10,8 @@ Welcome to imgvalidator's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   about
+   history
 
 
 Indices and tables
