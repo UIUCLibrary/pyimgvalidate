@@ -20,12 +20,16 @@ def find_icc_errors(image_file: py3exiv2bind.Image, expected_icc_profile_type):
 def validate_file(file_name, validation_profile: validation_profile.ValidationProfile):
     image_file = py3exiv2bind.Image(file_name)
     yield from find_embedded_errors(image_file, validation_profile.embedded_metadata_profile)
-    yield from find_icc_errors(image_file, validation_profile.icc_profile_type)
+    if validation_profile.icc_profile_type:
+        yield from find_icc_errors(image_file, validation_profile.icc_profile_type)
 
 
 def find_embedded_errors(image_file, embedded_metadata_profile):
     for test_name, (key, expected_value) in embedded_metadata_profile.items():
-        error = validate_value(test_name, image_file.metadata[key], expected_value=expected_value)
+        if not key in image_file.metadata:
+            error = "Expected metadata '{}' missing".format(key)
+        else:
+            error = validate_value(test_name, image_file.metadata[key], expected_value=expected_value)
         if error:
             yield error
 
