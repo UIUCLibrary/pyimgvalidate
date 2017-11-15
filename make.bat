@@ -57,7 +57,10 @@ goto :eof
     call:venv
     setlocal
     echo Installing development requirements
-    call venv\Scripts\activate.bat && pip install -r requirements-dev.txt --upgrade-strategy only-if-needed
+    call venv\Scripts\activate.bat
+    pip install -r requirements-dev.txt
+    pip install -r requirements.txt
+    pip install -r requirements.txt
     endlocal
 goto :eof
 
@@ -125,6 +128,7 @@ goto :eof
     call:install-dev
     setlocal
     call venv\Scripts\activate.bat
+    python -m pip install -r requirements.txt
     python -m pip install -r requirements-freeze.txt
     python cx_setup.py bdist_msi --add-to-path=true -k --bdist-dir build/msi
     call build\\msi\\imgvalidator.exe --pytest
