@@ -4,6 +4,9 @@ import typing
 from imgvalidator import validation_profile, validate, utils, report
 import imgvalidator
 import argparse
+from setuptools.config import read_configuration
+from pkg_resources import get_distribution
+package_metadata = get_distribution(__package__)
 
 
 def source(path):
@@ -17,12 +20,16 @@ def source(path):
 
 
 def get_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=imgvalidator.__description__)
+    try:
+        description = package_metadata.get_metadata(name="description")
+    except FileNotFoundError as e:
+        description = "error: Unable to load description information"
+    parser = argparse.ArgumentParser(description)
 
     parser.add_argument(
         '--version',
         action='version',
-        version=imgvalidator.__version__
+        version=package_metadata.version
     )
 
     parser.add_argument(
